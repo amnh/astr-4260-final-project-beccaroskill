@@ -42,7 +42,7 @@ _BASE_URL = "http://archive.stsci.edu/pub/kepler/lightcurves"
 
 
 def main():
-  kepler_csv_file = "../../FinalProject/Data/tce_mini.csv"
+  kepler_csv_file = "../../FinalProject/Data/tce_dr24.csv"
   output_file = "../../FinalProject/Data/download_kepler.sh"
   download_dir = "../../FinalProject/Data/kepler"
   # Read Kepler targets.
@@ -66,7 +66,6 @@ def main():
       kepid = "{0:09d}".format(int(kepid))  # Pad with zeros.
       subdir = "{}/{}".format(kepid[0:4], kepid)
       download_dir = os.path.join(download_dir, subdir)
-      print(download_dir)
       url = "{}/{}/".format(_BASE_URL, subdir)
       f.write("{} -P {} {}\n".format(_WGET_CMD, download_dir, url))
 

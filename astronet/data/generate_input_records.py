@@ -86,7 +86,7 @@ import tensorflow as tf
 
 from astronet.data import preprocess
 
-input_tce_csv_file = "FinalProject/Data/tce_mini.csv"
+input_tce_csv_file = "FinalProject/Data/tce_dr24.csv"
 kepler_data_dir="FinalProject/Data/kepler/"
 output_dir = "FinalProject/Data/tfrecord"
 
