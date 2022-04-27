@@ -43,7 +43,8 @@ _BASE_URL = "http://archive.stsci.edu/pub/kepler/lightcurves"
 
 def main():
   kepler_csv_file = "../../FinalProject/Data/tce_dr24.csv"
-  output_file = "../../FinalProject/Data/download_kepler.sh"
+  # output_file = "../../FinalProject/Data/download_kepler.sh"
+  output_file = "../../FinalProject/Data/bogus.sh"
   download_dir = "../../FinalProject/Data/kepler"
   # Read Kepler targets.
   kepids = set()
@@ -53,28 +54,31 @@ def main():
       kepids.add(row["kepid"])
 
   num_kepids = len(kepids)
-
+  n=0
   # Write wget commands to script file.
   with open(output_file, "w") as f:
     f.write("#!/bin/sh\n")
     f.write("echo 'Downloading {} Kepler targets to {}'\n".format(
         num_kepids, download_dir))
     for i, kepid in enumerate(kepids):
-      download_dir = "kepler"
-      if i and not i % 10:
-        f.write("echo 'Downloaded {}/{}'\n".format(i, num_kepids))
+      download_dir =  "../../FinalProject/Data/kepler"
+      
       kepid = "{0:09d}".format(int(kepid))  # Pad with zeros.
       subdir = "{}/{}".format(kepid[0:4], kepid)
       download_dir = os.path.join(download_dir, subdir)
-      url = "{}/{}/".format(_BASE_URL, subdir)
-      f.write("{} -P {} {}\n".format(_WGET_CMD, download_dir, url))
+      if not os.path.exists(download_dir):
+          if i and not i % 10:
+             f.write("echo 'Downloaded {}/{}'\n".format(i, num_kepids))
+          n+=1
+          url = "{}/{}/".format(_BASE_URL, subdir)
+          f.write("{} -P {} {}\n".format(_WGET_CMD, download_dir, url))
 
     f.write("echo 'Finished downloading {} Kepler targets to {}'\n".format(
         num_kepids, download_dir))
 
   # Make the download script executable.
   os.chmod(output_file, stat.S_IRWXU | stat.S_IRGRP | stat.S_IROTH)
-
+  print(n)
   print("{} Kepler targets will be downloaded to {}".format(
       num_kepids, output_file))
   print("To start download, run:\n  {}".format("./" + output_file

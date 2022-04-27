@@ -91,6 +91,7 @@ class AstroCNNModel(astro_model.AstroModel):
                 padding=hparams.convolution_padding,
                 activation=tf.nn.relu,
                 name="conv_{}".format(j + 1))
+            print(conv_op, num_filters)
             net = conv_op(net)
 
           if hparams.pool_size > 1:  # pool_size 0 or 1 denotes no pooling
@@ -98,9 +99,11 @@ class AstroCNNModel(astro_model.AstroModel):
                 pool_size=int(hparams.pool_size),
                 strides=int(hparams.pool_strides),
                 name="pool")
+            print(pool_op, int(hparams.pool_size))
             net = pool_op(net)
 
       # Flatten.
+      # print('Model', net.summary())
       net.shape.assert_has_rank(3)
       net_shape = net.shape.as_list()
       output_dim = net_shape[1] * net_shape[2]

@@ -29,69 +29,46 @@ from tf_util import config_util
 from tf_util import configdict
 from tf_util import estimator_runner
 
-parser = argparse.ArgumentParser()
 
-parser.add_argument(
-    "--model", type=str, required=True, help="Name of the model class.")
-
-parser.add_argument(
-    "--config_name",
-    type=str,
-    help="Name of the model and training configuration. Exactly one of "
-    "--config_name or --config_json is required.")
-
-parser.add_argument(
-    "--config_json",
-    type=str,
-    help="JSON string or JSON file containing the model and training "
-    "configuration. Exactly one of --config_name or --config_json is required.")
-
-parser.add_argument(
-    "--eval_files",
-    type=str,
-    required=True,
-    help="Comma-separated list of file patterns matching the TFRecord files in "
-    "the evaluation dataset.")
-
-parser.add_argument(
-    "--model_dir",
-    type=str,
-    required=True,
-    help="Directory containing a model checkpoint.")
-
-parser.add_argument(
-    "--eval_name", type=str, default="test", help="Name of the evaluation set.")
-
+tfrecord_dir = "FinalProject/Data/tfrecord"
+model = "AstroCNNModel"
+config_name = "local_global"
+config_json = None
+train_files=f"{tfrecord_dir}/train*"
+eval_files=f"{tfrecord_dir}/val*"
+model_dir = "FinalProject/Data/bogus"
+shuffle_buffer_size = 15000
+train_steps = 625
+eval_name = "test"
 
 def main(_):
-  model_class = models.get_model_class(FLAGS.model)
+  model_class = models.get_model_class(model)
 
   # Look up the model configuration.
-  assert (FLAGS.config_name is None) != (FLAGS.config_json is None), (
+  assert (config_name is None) != (config_json is None), (
       "Exactly one of --config_name or --config_json is required.")
   config = (
-      models.get_model_config(FLAGS.model, FLAGS.config_name)
-      if FLAGS.config_name else config_util.parse_json(FLAGS.config_json))
+      models.get_model_config(model, config_name)
+      if config_name else config_util.parse_json(config_json))
 
   config = configdict.ConfigDict(config)
 
   # Create the estimator.
   estimator = estimator_util.create_estimator(
-      model_class, config.hparams, model_dir=FLAGS.model_dir)
+      model_class, config.hparams, model_dir=model_dir)
 
   # Create an input function that reads the evaluation dataset.
   input_fn = estimator_util.create_input_fn(
-      file_pattern=FLAGS.eval_files,
+      file_pattern=eval_files,
       input_config=config.inputs,
       mode=tf.estimator.ModeKeys.EVAL)
 
   # Run evaluation. This will log the result to stderr and also write a summary
   # file in the model_dir.
-  eval_args = {"name": FLAGS.eval_name, "input_fn": input_fn}
+  eval_args = {"name": eval_name, "input_fn": input_fn}
   estimator_runner.evaluate(estimator, [eval_args])
 
 
 if __name__ == "__main__":
   tf.logging.set_verbosity(tf.logging.INFO)
-  FLAGS, unparsed = parser.parse_known_args()
-  tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+  tf.app.run(main=main)

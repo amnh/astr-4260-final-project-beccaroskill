@@ -214,12 +214,14 @@ class AstroModel(object):
             units=self.hparams.pre_logits_hidden_layer_size,
             activation=tf.nn.relu,
             name="fully_connected_{}".format(i + 1))
+        print(dense_op, self.hparams.pre_logits_hidden_layer_size)
         net = dense_op(net)
 
         if self.hparams.pre_logits_dropout_rate > 0:
           dropout_op = tf.keras.layers.Dropout(
               self.hparams.pre_logits_dropout_rate)
           net = dropout_op(net, training=self.is_training)
+          print(dropout_op, self.hparams.pre_logits_dropout_rate)
 
       # Identify the final pre-logits hidden layer as "pre_logits_hidden/final".
       tf.identity(net, "final")

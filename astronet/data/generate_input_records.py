@@ -107,10 +107,14 @@ def _process_tce(tce):
   Returns:
     A tensorflow.train.Example proto containing TCE features.
   """
-  all_time, all_flux = preprocess.read_light_curve(tce.kepid,
-                                                   kepler_data_dir)
-  time, flux = preprocess.process_light_curve(all_time, all_flux)
-  return preprocess.generate_example_for_tce(time, flux, tce)
+  try:
+      all_time, all_flux = preprocess.read_light_curve(tce.kepid,
+                                                       kepler_data_dir)
+      time, flux = preprocess.process_light_curve(all_time, all_flux)
+      return preprocess.generate_example_for_tce(time, flux, tce)
+  except Exception as e:
+      print(e)
+      return None
 
 
 def _process_file_shard(tce_table, file_name):
